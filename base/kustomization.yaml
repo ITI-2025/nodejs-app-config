@@ -6,7 +6,7 @@ resources:
   - redis.yaml
   - ingress.yaml
 
-images:
-  - name: infra-config
-    # newName: xxxxxxxx.dkr.ecr.region.amazonaws.com/vote
-    newTag: latest  # will be updated by image updater
+# images:
+#   - name: infra-config
+#     # newName: xxxxxxxx.dkr.ecr.region.amazonaws.com/vote
+#     newTag: latest  # will be updated by image updater
