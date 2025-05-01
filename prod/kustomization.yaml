@@ -4,5 +4,6 @@ resources:
   - ../base
 
 replicas:
-  - name: nodejs-app
-    count: 3
+- count: 2
+  name: nodejs-app
+namespace: prod
