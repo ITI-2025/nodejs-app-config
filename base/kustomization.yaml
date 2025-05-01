@@ -6,6 +6,9 @@ resources:
   - redis.yaml
   - ingress.yaml
 
+# imagePullSecrets:
+#   - name: ecr-regcred
+
 # images:
 #   - name: infra-config
 #     # newName: xxxxxxxx.dkr.ecr.region.amazonaws.com/vote
