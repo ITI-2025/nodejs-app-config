@@ -4,5 +4,5 @@ resources:
   - ../base
 
 replicas:
-  - name: nodejs-deployment
+  - name: nodejs-app
     count: 3
