@@ -7,4 +7,4 @@ resources:
   - ingress.yaml
 images:
   - name: 481665092783.dkr.ecr.eu-central-1.amazonaws.com/nodejs-app
-    newTag: v4
+    newTag: v45
