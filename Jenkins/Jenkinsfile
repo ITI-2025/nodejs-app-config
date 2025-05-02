@@ -1,0 +1,74 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:debug
+    command:
+    - /busybox/cat
+    tty: true
+    volumeMounts:
+    - name: workspace-volume
+      mountPath: /home/jenkins/agent
+  - name: aws-cli
+    image: amazon/aws-cli:2.15.30
+    command:
+    - cat
+    tty: true
+    volumeMounts:
+    - name: workspace-volume
+      mountPath: /home/jenkins/agent
+  volumes:
+  - name: workspace-volume
+    emptyDir: {}
+"""
+        }
+    }
+    environment {
+        AWS_REGION    = 'eu-central-1'
+        ECR_REGISTRY  = '481665092783.dkr.ecr.eu-central-1.amazonaws.com'
+        IMAGE_NAME    = 'nodejs-app'
+    }
+    stages {
+        stage('Clone Repo') {
+            steps {
+                git branch: 'node-js-app', url: 'https://github.com/ITI-2025/ITI-Graduation-Project.git'
+                sh 'ls -la nodeapp/'
+            }
+        }
+        stage('Build and Push Docker Image') {
+            steps {
+                container('kaniko') {
+                    sh '''
+                    /kaniko/executor --context `pwd`/nodeapp \
+                                     --destination $ECR_REGISTRY/$IMAGE_NAME:latest
+                    '''
+                }
+            }
+        }
+        stage('Login to ECR') {
+            steps {
+                container('aws-cli') {
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'aws-credentials',
+                            usernameVariable: 'AWS_ACCESS_KEY_ID',
+                            passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                        )
+                    ]) {
+                        sh '''
+                        aws --version
+                        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                        aws configure set region $AWS_REGION
+                        '''
+                    }
+                }
+            }
+        }
+    }
+}
